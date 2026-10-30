@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function preventDoubleTapZoom() {
   let lastTouchEnd = 0;
   document.addEventListener('touchend', (e) => {
-    if (e.target.closest('input, textarea, button, .cute-btn, .tab-btn, .top-pill-btn, .carousel-nav-btn')) {
+    if (e.target.closest('input, textarea, button, .cute-btn, .tab-btn, .top-pill-btn, .carousel-nav-btn, canvas, #scratchCanvas, .scratch-stage-wrapper, .quiz-btn-no, .quiz-btn-yes')) {
       return;
     }
     const now = (new Date()).getTime();
@@ -343,6 +343,14 @@ function goToPage(pageNum) {
   
   if (currentPage > 1 && !isAudioPlaying) {
     playMusic();
+  }
+
+  if (currentPage === 2) {
+    startLetterTypewriter();
+  } else {
+    if (isLetterTyping) {
+      finishTypewriter(true);
+    }
   }
   
   if (currentPage === 3) {
@@ -723,14 +731,14 @@ function triggerFireworksBurst() {
 }
 
 // ==========================================
-// VỆT TRÁI TIM THEO TAY (TOUCH / MOUSE)
+// VỆT TRÁI TIM & BỤI SAO PHÉP THUẬT (TOUCH / MOUSE)
 // ==========================================
 function setupCursorHearts() {
   let lastX = 0, lastY = 0;
   
   const handleMove = (x, y) => {
     const dist = Math.hypot(x - lastX, y - lastY);
-    if (dist > 35) {
+    if (dist > 22) {
       createMiniHeartCursor(x, y);
       lastX = x;
       lastY = y;
@@ -739,34 +747,39 @@ function setupCursorHearts() {
   
   window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
   window.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 0) {
+    if (e.touches && e.touches.length > 0) {
       handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length > 0) {
+      createMiniHeartCursor(e.touches[0].clientX, e.touches[0].clientY);
     }
   }, { passive: true });
 }
 
 function createMiniHeartCursor(x, y) {
+  const symbols = ['💖', '✨', '🌸', '💕', '⭐', '💓', '🌷'];
+  const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+  
   const heart = document.createElement('div');
-  const symbols = ['💖', '✨', '🌸', '💕'];
-  heart.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-  heart.style.cssText = `
-    position: fixed;
-    left: ${x}px;
-    top: ${y}px;
-    font-size: ${Math.random() * 10 + 14}px;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%) scale(1);
-    transition: transform 0.7s ease-out, opacity 0.7s ease-out;
-  `;
+  heart.className = 'magic-trail-particle';
+  heart.innerText = symbol;
+  
+  const dx = (Math.random() * 50 - 25) + 'px';
+  const dy = (-Math.random() * 45 - 20) + 'px';
+  const rot = (Math.random() * 70 - 35) + 'deg';
+  
+  heart.style.setProperty('--dx', dx);
+  heart.style.setProperty('--dy', dy);
+  heart.style.setProperty('--rot', rot);
+  heart.style.left = `${x}px`;
+  heart.style.top = `${y}px`;
+  heart.style.fontSize = `${Math.random() * 10 + 13}px`;
+  
   document.body.appendChild(heart);
-  
-  requestAnimationFrame(() => {
-    heart.style.transform = `translate(-50%, -${Math.random() * 40 + 25}px) scale(0.3) rotate(${Math.random() * 60 - 30}deg)`;
-    heart.style.opacity = '0';
-  });
-  
-  setTimeout(() => heart.remove(), 700);
+  setTimeout(() => heart.remove(), 850);
 }
 
 function createMiniBurst(x, y) {
@@ -1201,4 +1214,559 @@ function showUploadStatus(msg) {
     el.innerText = msg;
     burstHeartsAtCenter();
   }
+}
+
+// ========================================================
+// 1. HIỆU ỨNG GÕ MÁY ĐÁNH CHỮ THƯ TÌNH (TYPEWRITER EFFECT - TRANG 2)
+// ========================================================
+let typewriterTimeout = null;
+let isLetterTyping = false;
+let hasLetterTyped = false;
+
+const LETTER_TEXT_DATA = [
+  "Cảm ơn em đã xuất hiện trong cuộc đời anh, mang đến cho anh những nụ cười ấm áp, những niềm vui dịu dàng và những khoảnh khắc hạnh phúc không gì sánh bằng.",
+  "Dạo này em bận rộn và vất vả nhiều rồi, anh thấy hết và thương em thật nhiều 💗 Hãy luôn nhớ tự chăm sóc bản thân thật tốt nhé, đừng để bản thân mệt quá nha.",
+  "Mỗi ngày trôi qua có em đều là một ngày tuyệt vời đối với anh. Cảm ơn em vì đã là em, và cảm ơn vì đã chọn ở bên anh! 🌷✨"
+];
+
+function playSoftChime() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!webAudioCtx) webAudioCtx = new AudioContext();
+    if (webAudioCtx.state === 'suspended') webAudioCtx.resume();
+    
+    const osc = webAudioCtx.createOscillator();
+    const gain = webAudioCtx.createGain();
+    
+    const freqs = [523.25, 659.25, 783.99, 1046.50, 880.00];
+    osc.frequency.value = freqs[Math.floor(Math.random() * freqs.length)];
+    osc.type = 'sine';
+    
+    gain.gain.setValueAtTime(0.015, webAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, webAudioCtx.currentTime + 0.08);
+    
+    osc.connect(gain);
+    gain.connect(webAudioCtx.destination);
+    
+    osc.start();
+    osc.stop(webAudioCtx.currentTime + 0.08);
+  } catch(e) {}
+}
+
+function startLetterTypewriter() {
+  if (hasLetterTyped) return;
+  
+  const container = document.getElementById('wishLetterText');
+  const skipHint = document.getElementById('typewriterSkipHint');
+  if (!container) return;
+  
+  if (skipHint) skipHint.style.display = 'block';
+  
+  const pName = localStorage.getItem('partnerName') || CONFIG.partnerName;
+  const signatureText = `Mãi yêu em, ${pName}! ❤️`;
+  const fullLines = [...LETTER_TEXT_DATA, signatureText];
+  
+  container.innerHTML = '';
+  isLetterTyping = true;
+  
+  let lineIdx = 0;
+  let charIdx = 0;
+  
+  let currentEl = document.createElement('p');
+  currentEl.className = 'wish-paragraph';
+  container.appendChild(currentEl);
+  
+  const cursorSpan = document.createElement('span');
+  cursorSpan.className = 'typewriter-cursor';
+  cursorSpan.innerText = '|';
+  currentEl.appendChild(cursorSpan);
+  
+  function typeNext() {
+    if (!isLetterTyping) return;
+    
+    if (lineIdx < fullLines.length) {
+      const currentLineText = fullLines[lineIdx];
+      
+      if (charIdx < currentLineText.length) {
+        const char = currentLineText[charIdx];
+        cursorSpan.before(char);
+        charIdx++;
+        
+        if (charIdx % 4 === 0 && char !== ' ') {
+          playSoftChime();
+        }
+        
+        typewriterTimeout = setTimeout(typeNext, 22 + Math.random() * 14);
+      } else {
+        cursorSpan.remove();
+        lineIdx++;
+        charIdx = 0;
+        
+        if (lineIdx < fullLines.length) {
+          if (lineIdx === fullLines.length - 1) {
+            currentEl = document.createElement('div');
+            currentEl.className = 'wish-signature';
+          } else {
+            currentEl = document.createElement('p');
+            currentEl.className = 'wish-paragraph';
+          }
+          container.appendChild(currentEl);
+          currentEl.appendChild(cursorSpan);
+          typewriterTimeout = setTimeout(typeNext, 200);
+        } else {
+          finishTypewriter(false);
+        }
+      }
+    } else {
+      finishTypewriter(false);
+    }
+  }
+  
+  typeNext();
+}
+
+function skipTypewriter() {
+  if (!isLetterTyping) return;
+  finishTypewriter(true);
+}
+
+function finishTypewriter(instant = false) {
+  isLetterTyping = false;
+  if (typewriterTimeout) {
+    clearTimeout(typewriterTimeout);
+    typewriterTimeout = null;
+  }
+  
+  hasLetterTyped = true;
+  const container = document.getElementById('wishLetterText');
+  const skipHint = document.getElementById('typewriterSkipHint');
+  if (skipHint) skipHint.style.display = 'none';
+  
+  const cursor = document.querySelector('.typewriter-cursor');
+  if (cursor) cursor.remove();
+  
+  if (instant && container) {
+    const pName = localStorage.getItem('partnerName') || CONFIG.partnerName;
+    container.innerHTML = `
+      <p class="wish-paragraph">${LETTER_TEXT_DATA[0]}</p>
+      <p class="wish-paragraph">${LETTER_TEXT_DATA[1]}</p>
+      <p class="wish-paragraph">${LETTER_TEXT_DATA[2]}</p>
+      <div class="wish-signature">Mãi yêu em, <span class="partner-name-display">${pName}</span>! ❤️</div>
+    `;
+  }
+  
+  const deco = document.querySelector('.wish-bottom-deco');
+  if (deco) {
+    deco.style.animation = 'popInModal 0.5s ease-out';
+  }
+}
+
+// ========================================================
+// 2. MINI-GAME TRÊU GHẸO: "EM CÓ YÊU ANH KHÔNG?" (RUNAWAY BUTTON)
+// ========================================================
+const RUNAWAY_QUIPS = [
+  'Lêu lêu hụt rùi 😝',
+  'Đố bắt được nè! 🏃‍♀️',
+  'Chạy đâu cho thoát! 😜',
+  'Bắt buộc bấm YÊU thui! 💕',
+  'Hụt nữa rùi haha! 😂',
+  'Không bấm hông được! 😚',
+  'Càng né càng chứng tỏ yêu! 💖',
+  'Chịu thua chưa? Yêu anh đi 🥺'
+];
+
+let runawayQuipIndex = 0;
+
+function openLoveQuizModal() {
+  const modal = document.getElementById('loveQuizModal');
+  if (!modal) return;
+  
+  const qStage = document.getElementById('quizQuestionStage');
+  const sStage = document.getElementById('quizSuccessStage');
+  if (qStage) qStage.style.display = 'block';
+  if (sStage) sStage.style.display = 'none';
+  
+  const btnNo = document.getElementById('quizBtnNo');
+  if (btnNo) {
+    btnNo.style.left = '50%';
+    btnNo.style.top = '96px';
+    btnNo.style.transform = 'translateX(-50%)';
+    btnNo.innerText = '😜 Hông yêu đâu!';
+    
+    btnNo.onpointerenter = dodgeRunawayButton;
+    btnNo.ontouchstart = (e) => {
+      e.preventDefault();
+      dodgeRunawayButton(e);
+    };
+    btnNo.onpointerdown = (e) => {
+      e.preventDefault();
+      dodgeRunawayButton(e);
+    };
+  }
+  
+  modal.classList.add('active');
+  burstHeartsAtCenter();
+}
+
+function closeLoveQuizModal() {
+  const modal = document.getElementById('loveQuizModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function dodgeRunawayButton(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  const btnNo = document.getElementById('quizBtnNo');
+  const playground = document.getElementById('quizPlayground');
+  const btnYes = document.getElementById('quizBtnYes');
+  if (!btnNo || !playground) return;
+  
+  // 1. Cập nhật câu thoại trêu trước để đo chính xác bề rộng mới của nút
+  btnNo.innerText = RUNAWAY_QUIPS[runawayQuipIndex % RUNAWAY_QUIPS.length];
+  runawayQuipIndex++;
+  
+  // 2. Lấy kích thước thực tế của ô và của nút
+  const stageWidth = playground.clientWidth;
+  const stageHeight = playground.clientHeight;
+  const btnWidth = btnNo.offsetWidth;
+  const btnHeight = btnNo.offsetHeight;
+  
+  // Lấy vị trí nút Yes để né tránh chồng lên nút Yes
+  const yesTop = btnYes ? btnYes.offsetTop : 6;
+  const yesHeight = btnYes ? btnYes.offsetHeight : 44;
+  const yesBottom = yesTop + yesHeight;
+  
+  // 3. Vùng an toàn tuyệt đối: cách đều mép viền ô ít nhất 8px
+  const minX = 8;
+  const maxX = Math.max(minX, stageWidth - btnWidth - 8);
+  const minY = 8;
+  const maxY = Math.max(minY, stageHeight - btnHeight - 8);
+  
+  // 4. Chọn tọa độ ngẫu nhiên
+  let newX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+  let newY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+  
+  // Nếu tọa độ Y rơi vào vùng nút Yes (nửa trên), ưu tiên đẩy xuống vùng dưới hoặc 2 bên mép
+  if (newY < yesBottom + 6 && newY > yesTop - 6) {
+    if (stageHeight - yesBottom > btnHeight + 14) {
+      newY = Math.floor(Math.random() * (maxY - (yesBottom + 6) + 1)) + (yesBottom + 6);
+    } else {
+      newX = Math.random() < 0.5 ? minX : maxX;
+    }
+  }
+  
+  // Đảm bảo không bao giờ vượt ra ngoài ô
+  newX = Math.min(Math.max(minX, newX), maxX);
+  newY = Math.min(Math.max(minY, newY), maxY);
+  
+  const rot = Math.floor(Math.random() * 16 - 8);
+  
+  // Gán vị trí tuyệt đối - Nút 100% nằm trọn vẹn trong ô, không bị che khuất!
+  btnNo.style.left = `${newX}px`;
+  btnNo.style.top = `${newY}px`;
+  btnNo.style.transform = `rotate(${rot}deg)`;
+  
+  const bRect = btnNo.getBoundingClientRect();
+  createMiniBurst(bRect.left + bRect.width / 2, bRect.top + bRect.height / 2);
+  playSoftChime();
+}
+
+function handleLoveYes() {
+  const qStage = document.getElementById('quizQuestionStage');
+  const sStage = document.getElementById('quizSuccessStage');
+  if (qStage) qStage.style.display = 'none';
+  if (sStage) sStage.style.display = 'block';
+  
+  burstHeartsAtCenter();
+  launchFireworksShow();
+  shootHeartShower();
+  
+  setTimeout(() => {
+    stopFireworksShow();
+  }, 4000);
+}
+
+function finishQuizWithKiss() {
+  closeLoveQuizModal();
+  goToPage(5);
+  sendKissesFountain();
+}
+
+function resetLoveQuiz() {
+  openLoveQuizModal();
+}
+
+// ========================================================
+// 3. THẺ CÀO TÌNH YÊU MAY MẮN (LOVE SCRATCH CARD)
+// ========================================================
+function getLoveVoucher(idx) {
+  const pName = localStorage.getItem('partnerName') || CONFIG.partnerName;
+  const list = [
+    {
+      icon: '🧋',
+      title: 'VÉ ĐẶC QUYỀN VÔ HẠN',
+      desc: `${pName} được quyền bắt Anh mua trà sữa, dắt đi ăn mọi món ngon mà không được từ chối!`,
+      term: '🌸 Hạn dùng: Suốt đời bên nhau • Vô điều kiện 💖'
+    },
+    {
+      icon: '🤗',
+      title: 'VÉ MIỄN TRỪ GIẬN DỖI',
+      desc: `Mỗi khi ${pName} dỗi, chỉ cần giơ vé này là Anh phải ôm thật chặt và xin lỗi dỗ dành ngay!`,
+      term: '🌸 Hạn dùng: Vĩnh viễn • Có tác dụng an ủi 100% 💖'
+    },
+    {
+      icon: '👑',
+      title: 'VÉ ĐỆ NHẤT CHIỀU CHUỘNG',
+      desc: `1 Ngày Anh làm người hầu độc quyền cho ${pName}: đấm lưng, bóp vai và cưng chiều 100%!`,
+      term: '🌸 Hạn dùng: Trọn đời • Áp dụng mọi lúc mọi nơi 💖'
+    },
+    {
+      icon: '💋',
+      title: 'VÉ 1000 NỤ HÔN ẤM ÁP',
+      desc: `Đổi lấy 1000 nụ hôn ngọt ngào và những cái ôm siết chặt từ Anh bất cứ khi nào em muốn!`,
+      term: '🌸 Hạn dùng: Bất tận • Nạp đầy năng lượng yêu thương 💖'
+    },
+    {
+      icon: '🌟',
+      title: 'VÉ NGUYỆN ƯỚC TRỌN ĐỜI',
+      desc: `Anh hứa thực hiện trọn vẹn 1 điều ước bí mật bất kỳ của ${pName}, khó mấy cũng làm!`,
+      term: '🌸 Hạn dùng: Mãi mãi • Lời thề của người yêu em 💍'
+    },
+    {
+      icon: '✈️',
+      title: 'VÉ ĐI TRỐN CÙNG NHAU',
+      desc: `Một chuyến đi hẹn hò chỉ riêng hai đứa mình đến nơi mà ${pName} thích nhất cùng Anh!`,
+      term: '🌸 Hạn dùng: Suốt thanh xuân • Cùng em đi khắp thế gian 🌈'
+    }
+  ];
+  return list[idx % list.length];
+}
+
+let currentVoucherIndex = 0;
+let isCardRevealed = false;
+let scratchPixelCount = 0;
+
+function openScratchCardModal(e) {
+  if (e) e.stopPropagation();
+  const modal = document.getElementById('scratchCardModal');
+  if (!modal) return;
+  
+  modal.classList.add('active');
+  // Chờ animation modal hiển thị để lấy kích thước canvas chính xác
+  setTimeout(() => {
+    initScratchCard(currentVoucherIndex);
+  }, 60);
+}
+
+function closeScratchCardModal() {
+  const modal = document.getElementById('scratchCardModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function initScratchCard(voucherIdx) {
+  isCardRevealed = false;
+  scratchPixelCount = 0;
+  
+  const voucher = getLoveVoucher(voucherIdx);
+  
+  const vIcon = document.getElementById('voucherIcon');
+  const vTitle = document.getElementById('voucherTitle');
+  const vDesc = document.getElementById('voucherDesc');
+  const vTerm = document.getElementById('voucherTerm');
+  const hintText = document.getElementById('scratchHintText');
+  
+  if (vIcon) vIcon.innerText = voucher.icon;
+  if (vTitle) vTitle.innerText = voucher.title;
+  if (vDesc) vDesc.innerText = voucher.desc;
+  if (vTerm) vTerm.innerText = voucher.term;
+  if (hintText) hintText.innerHTML = '✨ Dùng ngón tay cào nhẹ lớp nhũ để mở quà nhé! 🎁';
+  
+  const wrapper = document.getElementById('scratchStageWrapper');
+  const canvas = document.getElementById('scratchCanvas');
+  if (!canvas || !wrapper) return;
+  
+  canvas.style.opacity = '1';
+  canvas.style.pointerEvents = 'auto';
+  
+  const rect = wrapper.getBoundingClientRect();
+  const width = Math.round(rect.width || 310);
+  const height = Math.round(rect.height || 160);
+  
+  canvas.width = width;
+  canvas.height = height;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  
+  // Vẽ lớp nhũ vàng hồng ánh kim lấp lánh
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, '#fbc2eb');
+  grad.addColorStop(0.3, '#fbe4ee');
+  grad.addColorStop(0.5, '#ffd166');
+  grad.addColorStop(0.8, '#ff9ebb');
+  grad.addColorStop(1, '#ffccd5');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+  
+  // Họa tiết lấp lánh trên lớp cào
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  for (let i = 0; i < 28; i++) {
+    const rx = Math.random() * width;
+    const ry = Math.random() * height;
+    ctx.beginPath();
+    ctx.arc(rx, ry, Math.random() * 3 + 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  ctx.fillStyle = '#68253b';
+  ctx.font = 'bold 14px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✨ CÀO LỚP NHŨ NÀY NÈ ✨', width / 2, height / 2 - 12);
+  
+  ctx.font = '12px Nunito, sans-serif';
+  ctx.fillStyle = '#8c3552';
+  ctx.fillText('🎁 Vuốt ngón tay để mở điều ước bí mật', width / 2, height / 2 + 13);
+  
+  setupScratchEvents(canvas, ctx);
+}
+
+function setupScratchEvents(canvas, ctx) {
+  let isDown = false;
+  
+  const getPos = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+      rawX: clientX,
+      rawY: clientY
+    };
+  };
+  
+  const scratch = (pos) => {
+    if (isCardRevealed) return;
+    
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    
+    if (Math.random() < 0.4) {
+      createMiniHeartCursor(pos.rawX, pos.rawY);
+    }
+    
+    scratchPixelCount++;
+    if (scratchPixelCount % 10 === 0) {
+      checkScratchCompletion(canvas, ctx);
+    }
+  };
+  
+  canvas.onmousedown = (e) => {
+    isDown = true;
+    scratch(getPos(e));
+  };
+  
+  window.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    scratch(getPos(e));
+  });
+  
+  window.addEventListener('mouseup', () => {
+    isDown = false;
+  });
+  
+  canvas.ontouchstart = (e) => {
+    e.preventDefault();
+    isDown = true;
+    scratch(getPos(e));
+  };
+  
+  canvas.ontouchmove = (e) => {
+    e.preventDefault();
+    if (!isDown) return;
+    scratch(getPos(e));
+  };
+  
+  canvas.ontouchend = () => {
+    isDown = false;
+    checkScratchCompletion(canvas, ctx);
+  };
+}
+
+function checkScratchCompletion(canvas, ctx) {
+  if (isCardRevealed) return;
+  
+  try {
+    const width = canvas.width;
+    const height = canvas.height;
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+    
+    let transparent = 0;
+    const sampleRate = 32;
+    const totalSamples = data.length / (4 * sampleRate);
+    
+    for (let i = 3; i < data.length; i += 4 * sampleRate) {
+      if (data[i] < 128) transparent++;
+    }
+    
+    const percentage = (transparent / totalSamples) * 100;
+    
+    if (percentage > 38) {
+      revealScratchCard();
+    }
+  } catch(e) {}
+}
+
+function revealScratchCard() {
+  if (isCardRevealed) return;
+  isCardRevealed = true;
+  
+  const canvas = document.getElementById('scratchCanvas');
+  const hintText = document.getElementById('scratchHintText');
+  
+  if (canvas) {
+    canvas.style.opacity = '0';
+    canvas.style.pointerEvents = 'none';
+  }
+  
+  if (hintText) {
+    const pName = localStorage.getItem('partnerName') || CONFIG.partnerName;
+    hintText.innerHTML = `🎉 <b style="color: #ff0055;">Chúc mừng ${pName} đã mở khóa điều ước!</b> Nhận quà ngay nè 💕`;
+  }
+  
+  burstHeartsAtCenter();
+  playSoftChime();
+}
+
+function rollNextScratchCard() {
+  currentVoucherIndex++;
+  initScratchCard(currentVoucherIndex);
+  burstHeartsAtCenter();
+}
+
+function claimScratchReward() {
+  if (!isCardRevealed) {
+    revealScratchCard();
+  }
+  
+  const voucher = getLoveVoucher(currentVoucherIndex);
+  burstHeartsAtCenter();
+  shootHeartShower();
+  
+  const hintText = document.getElementById('scratchHintText');
+  if (hintText) {
+    hintText.innerHTML = `💌 <b>Đã nhận "${voucher.title}"!</b> Anh hứa sẽ thực hiện trọn vẹn cho em! 💖`;
+  }
+  
+  setTimeout(() => {
+    closeScratchCardModal();
+  }, 2200);
 }

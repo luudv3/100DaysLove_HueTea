@@ -40,8 +40,8 @@ html, body {
   width: 100%;
   height: 100%;
   height: 100vh;
-  height: 100dvh;
   height: -webkit-fill-available;
+  height: 100dvh;
   overflow: hidden !important;
   position: fixed;
   top: 0;
@@ -58,13 +58,13 @@ body {
   color: var(--text-dark);
 }
 
-/* Khung viền hồng cute ôm sát mép màn hình iPhone 11 đến iPhone 17 */
+/* Khung viền hồng cute ôm sát mép màn hình iPhone 10 (X) đến iPhone 17 */
 .cute-frame {
   position: fixed;
-  top: max(8px, env(safe-area-inset-top));
-  left: max(8px, env(safe-area-inset-left));
-  right: max(8px, env(safe-area-inset-right));
-  bottom: max(8px, env(safe-area-inset-bottom));
+  top: max(6px, env(safe-area-inset-top));
+  left: max(6px, env(safe-area-inset-left));
+  right: max(6px, env(safe-area-inset-right));
+  bottom: max(6px, env(safe-area-inset-bottom));
   border: 3px dashed #ff8fab;
   border-radius: 28px;
   pointer-events: none;
@@ -251,12 +251,13 @@ body {
   width: 100%;
   height: 100%;
   height: 100vh;
+  height: -webkit-fill-available;
   height: 100dvh;
   position: relative;
   overflow: hidden;
 }
 
-/* MỖI TRANG CỐ ĐỊNH VỪA KHÍT 1 KHUNG HÌNH (100dvh - TƯƠNG THÍCH HOÀN HẢO IPHONE 11 ĐẾN 17) */
+/* MỖI TRANG CỐ ĐỊNH VỪA KHÍT 1 KHUNG HÌNH (100dvh - TƯƠNG THÍCH HOÀN HẢO IPHONE 10 ĐẾN 17) */
 .page {
   position: absolute;
   top: 0;
@@ -264,21 +265,23 @@ body {
   width: 100%;
   height: 100%;
   height: 100vh;
+  height: -webkit-fill-available;
   height: 100dvh;
   opacity: 0;
   visibility: hidden;
   transform: scale(0.95);
-  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
-  padding-top: calc(max(8px, env(safe-area-inset-top)) + 48px);
-  padding-bottom: calc(max(10px, env(safe-area-inset-bottom)) + 14px);
-  padding-left: max(12px, env(safe-area-inset-left));
-  padding-right: max(12px, env(safe-area-inset-right));
+  transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+  padding-top: calc(max(6px, env(safe-area-inset-top)) + clamp(36px, 4.8vh, 46px));
+  padding-bottom: calc(max(8px, env(safe-area-inset-bottom)) + clamp(6px, 1.5vh, 12px));
+  padding-left: max(10px, calc(env(safe-area-inset-left) + 6px));
+  padding-right: max(10px, calc(env(safe-area-inset-right) + 6px));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   z-index: 10;
+  box-sizing: border-box;
 }
 
 .page.active {
@@ -1378,7 +1381,444 @@ body {
 }
 
 /* ========================================================
-   BỘ TỐI ƯU HÓA ĐẶC BIỆT DÀNH CHO IPHONE 11 ĐẾN IPHONE 17
+   1. CHỮ GÕ MÁY ĐÁNH THƯ TÌNH (TYPEWRITER EFFECT)
+   ======================================================== */
+.typewriter-cursor {
+  display: inline-block;
+  font-weight: 900;
+  color: var(--pink-600);
+  animation: blinkCursor 0.65s infinite;
+  margin-left: 2px;
+  vertical-align: baseline;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typewriter-skip-hint {
+  display: block;
+  font-size: 0.66rem;
+  color: var(--pink-400);
+  text-align: right;
+  margin-top: 3px;
+  font-style: italic;
+  opacity: 0.85;
+  transition: opacity 0.3s;
+}
+
+/* Nút kích hoạt Thẻ cào trên Trang 2 & Trang 5 */
+.scratch-trigger-btn {
+  background: linear-gradient(135deg, #ffd166 0%, #ff9ebb 100%);
+  color: #5c2236;
+  border: 1.5px solid #ffb3c1;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: clamp(0.72rem, 2.7vw, 0.82rem);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(255, 158, 187, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 3px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: subtleBounce 2.5s infinite;
+}
+
+.scratch-trigger-btn:active {
+  transform: scale(0.96);
+}
+
+@keyframes subtleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* ========================================================
+   2. TRANG 5: CẶP NÚT TƯƠNG TÁC (THỬ LÒNG & HÔN)
+   ======================================================== */
+.p5-actions-grid {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0;
+  flex-shrink: 0;
+}
+
+.fun-quiz-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #ffeef4 0%, #ffd6e4 100%);
+  color: var(--pink-600);
+  border: 2px solid #ff9ebb;
+  border-radius: 50px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: clamp(0.78rem, 3.1vw, 0.9rem);
+  padding: 7px 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 112, 150, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 38px;
+  transition: all 0.2s;
+  animation: pulseCute 2.2s infinite;
+}
+
+.fun-quiz-btn:active {
+  transform: scale(0.95);
+}
+
+@keyframes pulseCute {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); box-shadow: 0 6px 18px rgba(255, 71, 126, 0.35); }
+}
+
+.p5-actions-grid .kiss-action-btn {
+  flex: 1.1;
+  margin: 0;
+  min-height: 38px;
+  padding: 7px 10px;
+  font-size: clamp(0.78rem, 3.1vw, 0.9rem);
+}
+
+/* ========================================================
+   3. MODAL THỬ LÒNG BÉ YÊU (RUNAWAY BUTTON MINI-GAME)
+   ======================================================== */
+.quiz-modal-box {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: clamp(16px, 3vh, 22px) clamp(14px, 3.8vw, 20px);
+  max-width: 370px;
+  width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  position: relative;
+  border: 3.5px solid #ffb3c1;
+  box-shadow: 0 20px 50px rgba(255, 71, 126, 0.35);
+  animation: popInModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInModal {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.quiz-badge {
+  background: #ffe3ec;
+  color: var(--pink-600);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.quiz-question-title {
+  font-family: 'Pacifico', cursive;
+  color: var(--pink-600);
+  font-size: clamp(1.25rem, 5vw, 1.55rem);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.quiz-question-sub {
+  font-size: clamp(0.82rem, 3.2vw, 0.92rem);
+  color: #633e4c;
+  line-height: 1.45;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.quiz-interactive-stage {
+  position: relative;
+  min-height: 175px;
+  width: 100%;
+  background: #fff8fa;
+  border-radius: 20px;
+  border: 1.5px dashed #ffc2d4;
+  padding: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.quiz-btn-yes {
+  background: linear-gradient(135deg, #ff0055 0%, #ff477e 100%);
+  color: white;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: clamp(0.85rem, 3.4vw, 0.96rem);
+  padding: 10px 18px;
+  border-radius: 40px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 0, 85, 0.35);
+  animation: pulseBeat 1.4s infinite;
+  display: block;
+  margin: 6px auto 0;
+  width: fit-content;
+  max-width: 95%;
+  position: relative;
+  z-index: 5;
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+
+.quiz-btn-yes:active {
+  transform: scale(0.95);
+}
+
+.quiz-btn-no {
+  background: white;
+  color: #7a4859;
+  border: 2px solid #ff9ebb;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: clamp(0.76rem, 2.9vw, 0.85rem);
+  padding: 7px 14px;
+  border-radius: 40px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: absolute;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
+  transition: left 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), top 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), transform 0.2s ease, background-color 0.2s;
+  box-sizing: border-box;
+}
+
+.quiz-success-view {
+  padding: 10px 4px;
+}
+
+.quiz-success-emoji {
+  font-size: clamp(42px, 12vw, 56px);
+  animation: bounceEmoji 1.2s infinite;
+  margin-bottom: 6px;
+}
+
+@keyframes bounceEmoji {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.1); }
+}
+
+.quiz-success-title {
+  font-family: 'Pacifico', cursive;
+  color: #ff0055;
+  font-size: clamp(1.3rem, 5vw, 1.6rem);
+  margin-bottom: 8px;
+}
+
+.quiz-success-desc {
+  font-size: clamp(0.86rem, 3.3vw, 0.95rem);
+  color: #4a2835;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+
+/* ========================================================
+   4. MODAL THẺ CÀO TÌNH YÊU MAY MẮN (LOVE SCRATCH CARD)
+   ======================================================== */
+.scratch-modal-box {
+  background: #ffffff;
+  border-radius: 26px;
+  padding: clamp(14px, 2.5vh, 20px) clamp(12px, 3.5vw, 18px);
+  max-width: 375px;
+  width: 100%;
+  max-height: calc(100dvh - 28px);
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  position: relative;
+  border: 3.5px solid #ffd166;
+  box-shadow: 0 20px 50px rgba(255, 179, 71, 0.35);
+  animation: popInModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.scratch-ticket {
+  background: linear-gradient(135deg, #fff0f5 0%, #fff7ea 50%, #ffe8ee 100%);
+  border: 2px dashed #ff9ebb;
+  border-radius: 20px;
+  padding: 10px 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 15px rgba(255, 182, 193, 0.3);
+}
+
+.scratch-ticket-badge {
+  background: linear-gradient(135deg, #ff477e, #ff0055);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 3px 12px;
+  border-radius: 14px;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+.scratch-ticket-title {
+  font-family: 'Pacifico', cursive;
+  color: var(--pink-600);
+  font-size: clamp(1.1rem, 4.2vw, 1.35rem);
+  margin-bottom: 2px;
+}
+
+.scratch-ticket-subtitle {
+  font-size: 0.74rem;
+  color: #7a4859;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Khung khu vực cào (Scratch Stage) */
+.scratch-stage-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 325px;
+  height: clamp(155px, 24vh, 175px);
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  border: 2px solid #ffd166;
+  touch-action: none;
+  background: white;
+}
+
+/* Phần quà ẩn giấu bên dưới */
+.scratch-hidden-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  background: radial-gradient(circle, #ffffff 0%, #fff0f5 100%);
+  text-align: center;
+  z-index: 1;
+}
+
+.voucher-icon {
+  font-size: 24px;
+  line-height: 1;
+  margin: 0;
+  filter: drop-shadow(0 2px 4px rgba(255, 71, 126, 0.2));
+}
+
+.voucher-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: clamp(0.82rem, 3.2vw, 0.92rem);
+  color: #ff0055;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  margin: 2px 0;
+}
+
+.voucher-desc {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(0.72rem, 2.8vw, 0.8rem);
+  color: #4a2835;
+  line-height: 1.4;
+  font-weight: 700;
+  max-width: 95%;
+  margin: 2px 0;
+}
+
+.voucher-term {
+  font-size: clamp(0.62rem, 2.4vw, 0.68rem);
+  color: #9e6476;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Canvas phủ lớp nhũ lên trên */
+#scratchCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity 0.5s ease-out;
+}
+
+#scratchCanvas:active {
+  cursor: grabbing;
+}
+
+.scratch-hint-text {
+  font-size: 0.74rem;
+  color: #855364;
+  margin-top: 8px;
+  font-weight: 700;
+  min-height: 18px;
+  line-height: 1.35;
+}
+
+.scratch-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.scratch-actions-row .cute-btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: clamp(0.75rem, 2.9vw, 0.85rem);
+}
+
+/* ========================================================
+   5. HIỆU ỨNG VỆT NGÓN TAY PHÉP THUẬT (MAGIC HEART TRAIL)
+   ======================================================== */
+.magic-trail-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+  animation: magicFadeOut 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes magicFadeOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.25) rotate(var(--rot));
+  }
+}
+
+/* ========================================================
+   BỘ TỐI ƯU HÓA TOÀN DIỆN CHO IPHONE 10 (X) ĐẾN IPHONE 17
+   - iPhone X, XS, XR, XS Max
    - iPhone 11, 11 Pro, 11 Pro Max
    - iPhone 12, 12 Mini, 12 Pro, 12 Pro Max
    - iPhone 13, 13 Mini, 13 Pro, 13 Pro Max
@@ -1388,102 +1828,151 @@ body {
    - iPhone 17, 17 Pro, 17 Pro Max
    ======================================================== */
 
-/* Nhóm 1: Màn hình nhỏ gọn (iPhone 11 Pro, 12 Mini, 13 Mini - Chiều rộng <= 380px) */
+/* Nhóm 1: Màn hình nhỏ & vừa (iPhone X, XS, 11 Pro, 12 Mini, 13 Mini - Chiều rộng <= 380px) */
 @media screen and (max-width: 380px) {
-  .p1-card { padding: 12px 10px; border-radius: 22px; }
+  .page {
+    padding-left: max(8px, calc(env(safe-area-inset-left) + 4px));
+    padding-right: max(8px, calc(env(safe-area-inset-right) + 4px));
+  }
+  .p1-card { padding: 14px 10px; border-radius: 22px; max-width: 330px; }
   .window-doors { width: 85px; height: 68px; margin-bottom: 4px; }
-  .gift-box-emoji { font-size: 45px; }
+  .gift-box-emoji { font-size: 46px; }
   .p1-title { font-size: 1.25rem; }
   .p1-desc { font-size: 0.76rem; margin-bottom: 8px; }
   .cute-btn { padding: 8px 16px; font-size: 0.82rem; }
+  
+  .p2-content-card { padding: 8px 6px; }
   .polaroid-feature { width: 72px; padding: 4px 4px 8px; }
   .wish-envelope-title { font-size: 1.15rem; }
-  .wish-paragraph { font-size: 0.78rem; line-height: 1.45; }
-  .carousel-card-active { max-height: 220px; }
-  .orbit-stage { width: 160px; height: 105px; }
-  .kissing-halo { width: 86px; height: 86px; }
-  .p5-vow-card { padding: 4px 8px; }
-  .p5-vow-quote { font-size: 0.8rem; }
-  .config-modal-box { padding: 14px 12px; }
-}
-
-/* Nhóm 2: Khi Safari mở thanh Tab Bar / Chiều cao khả dụng ngắn (Height <= 750px) */
-@media screen and (max-height: 750px) {
-  .page {
-    padding-top: calc(max(6px, env(safe-area-inset-top)) + 40px);
-    padding-bottom: calc(max(8px, env(safe-area-inset-bottom)) + 8px);
-  }
-  .p1-card { padding: 12px 10px; }
-  .window-doors { width: 75px; height: 60px; margin-bottom: 4px; }
-  .window-bg { font-size: 34px; }
-  .gift-box-emoji { font-size: 42px; margin-bottom: 4px; }
-  .sparkle-label { font-size: 0.68rem; padding: 2px 10px; margin-bottom: 4px; }
-  .p1-title { font-size: 1.2rem; margin-bottom: 4px; }
-  .p1-desc { font-size: 0.75rem; margin-bottom: 8px; }
+  .wish-envelope-sub { font-size: 0.7rem; }
+  .wish-paragraph { font-size: 0.76rem; line-height: 1.42; margin-bottom: 5px; }
+  .wish-signature { font-size: 1.15rem; }
   
-  .p2-header { margin-bottom: 2px; }
-  .p2-content-card { padding: 6px; margin-bottom: 4px; }
-  .polaroid-feature { width: 70px; }
-  .wish-letter-box { padding: 6px; margin: 4px 0; }
-  .wish-paragraph { font-size: 0.76rem; line-height: 1.4; margin-bottom: 4px; }
-  .pulse-main { font-size: 22px; }
-  .sweet-vow-badge { font-size: 0.72rem; padding: 3px 10px; }
-  .finish-reading-btn { padding: 8px 14px; font-size: 0.82rem; }
-  
-  .fireworks-hero-banner { padding: 10px 8px; }
-  .love-heart-beat { font-size: 32px; margin: 1px 0; }
-  .love-days-box { padding: 5px; margin-bottom: 8px; }
-  .counter-num-box { padding: 4px 2px; }
+  .fireworks-hero-banner { padding: 12px 8px; }
+  .p3-main-title { font-size: 1.25rem; }
   .counter-num-val { font-size: 1.05rem; }
   
-  .carousel-card-active { max-height: 200px; }
-  .media-tab-bar { margin: 2px 0 4px; }
-  .tab-btn { padding: 3px 12px; font-size: 0.74rem; }
+  .carousel-card-active { max-height: 220px; }
   
-  .orbit-stage { height: 100px; width: 160px; }
-  .kissing-halo { width: 84px; height: 84px; }
-  .kiss-heart-burst { font-size: 16px; top: -11px; }
-  .p5-vow-card { padding: 4px 8px; margin: 1px 0; }
-  .p5-vow-quote { font-size: 0.8rem; line-height: 1.3; }
-  .kiss-action-btn { padding: 6px 12px; font-size: 0.82rem; min-height: 35px; }
-  .bottom-nav-row .cute-btn { padding: 6px 8px; font-size: 0.75rem; min-height: 35px; }
+  .orbit-stage { width: 170px; height: 110px; }
+  .kissing-halo { width: 88px; height: 88px; }
+  .p5-vow-card { padding: 4px 8px; }
+  .p5-vow-quote { font-size: 0.8rem; }
+  
+  .config-modal-box { padding: 14px 12px; }
+  .scratch-modal-box, .quiz-modal-box { padding: 14px 10px; max-width: 320px; }
+  .quiz-btn-yes { padding: 8px 14px; font-size: 0.82rem; }
+  .quiz-btn-no { padding: 6px 12px; font-size: 0.74rem; top: 88px; }
+  .quiz-interactive-stage { min-height: 155px; }
+  .scratch-stage-wrapper { height: 154px; max-width: 295px; }
+  .voucher-title { font-size: 0.84rem; }
+  .voucher-desc { font-size: 0.72rem; }
+  .top-pill-btn { padding: 5px 10px; font-size: 0.76rem; }
 }
 
-/* Nhóm 3: Màn hình lớn (iPhone Plus / Pro Max: 11 Pro Max, 12/13/14/15/16/17 Pro Max, 14/15/16 Plus - Width >= 414px) */
+/* Nhóm 2: Màn hình chuẩn (iPhone 12, 12 Pro, 13, 13 Pro, 14, 14 Pro, 15, 15 Pro, 16, 16 Pro, 17, 17 Pro - Width 381px - 413px) */
+@media screen and (min-width: 381px) and (max-width: 413px) {
+  .p1-card { padding: 18px 16px; border-radius: 26px; max-width: 365px; }
+  .window-doors { width: 95px; height: 75px; margin-bottom: 8px; }
+  .gift-box-emoji { font-size: 56px; }
+  .p1-title { font-size: 1.4rem; }
+  .p2-content-card { padding: 10px; }
+  .polaroid-feature { width: 82px; }
+  .carousel-card-active { max-height: clamp(235px, 35vh, 275px); }
+  .orbit-stage { width: 195px; height: 130px; }
+  .kissing-halo { width: 102px; height: 102px; }
+  .scratch-stage-wrapper { height: 160px; max-width: 320px; }
+  .quiz-interactive-stage { min-height: 170px; }
+}
+
+/* Nhóm 3: Màn hình lớn (iPhone Plus / Pro Max: XR, XS Max, 11, 11 Pro Max, 12/13/14/15/16/17 Pro Max, 14/15/16 Plus - Width >= 414px) */
 @media screen and (min-width: 414px) and (min-height: 840px) {
-  .p1-card { padding: 26px 22px; max-width: 430px; }
-  .window-doors { width: 120px; height: 95px; margin-bottom: 12px; }
-  .gift-box-emoji { font-size: 72px; }
-  .p1-title { font-size: 1.65rem; }
-  .p1-desc { font-size: 0.9rem; }
+  .p1-card { padding: 24px 20px; max-width: 430px; }
+  .window-doors { width: 110px; height: 88px; margin-bottom: 12px; }
+  .gift-box-emoji { font-size: 68px; }
+  .p1-title { font-size: 1.6rem; }
+  .p1-desc { font-size: 0.88rem; }
   
-  .p2-content-card { padding: 14px; }
-  .polaroid-feature { width: 100px; }
-  .wish-paragraph { font-size: 0.88rem; line-height: 1.6; }
+  .p2-content-card { padding: 14px; max-width: 430px; }
+  .polaroid-feature { width: 95px; }
+  .wish-paragraph { font-size: 0.86rem; line-height: 1.58; }
   
-  .fireworks-hero-banner { padding: 20px 16px; }
-  .counter-num-val { font-size: 1.35rem; }
+  .fireworks-hero-banner { padding: 18px 16px; max-width: 430px; }
+  .counter-num-val { font-size: 1.3rem; }
   
-  .carousel-card-active { max-height: 330px; }
+  .carousel-card-active { max-height: clamp(270px, 38vh, 330px); }
   
-  .orbit-stage { width: 220px; height: 140px; }
-  .kissing-halo { width: 116px; height: 116px; }
-  .p5-vow-quote { font-size: 1.02rem; }
+  .orbit-stage { width: 220px; height: 142px; }
+  .kissing-halo { width: 114px; height: 114px; }
+  .p5-vow-quote { font-size: 1rem; }
+  .scratch-stage-wrapper { height: 168px; max-width: 330px; }
 }
 
-/* Nhóm 4: Màn hình cực ngắn hoặc khi bàn phím ảo hiển thị (Height <= 600px) */
+/* Nhóm 4: Khi Safari mở thanh Tab Bar / Chiều cao khả dụng ngắn (Height <= 750px) */
+@media screen and (max-height: 750px) {
+  .page {
+    padding-top: calc(max(6px, env(safe-area-inset-top)) + 36px);
+    padding-bottom: calc(max(6px, env(safe-area-inset-bottom)) + 6px);
+  }
+  .p1-card { padding: 10px 8px; }
+  .window-doors { width: 70px; height: 56px; margin-bottom: 2px; }
+  .window-bg { font-size: 32px; }
+  .gift-box-emoji { font-size: 38px; margin-bottom: 2px; }
+  .sparkle-label { font-size: 0.66rem; padding: 2px 8px; margin-bottom: 2px; }
+  .p1-title { font-size: 1.15rem; margin-bottom: 2px; }
+  .p1-desc { font-size: 0.74rem; margin-bottom: 6px; }
+  
+  .p2-header { margin-bottom: 2px; }
+  .p2-content-card { padding: 6px 8px; margin-bottom: 2px; }
+  .polaroid-feature { width: 68px; }
+  .wish-letter-box { padding: 6px 8px; margin: 3px 0; }
+  .wish-paragraph { font-size: 0.74rem; line-height: 1.35; margin-bottom: 3px; }
+  .pulse-main { font-size: 20px; }
+  .sweet-vow-badge { font-size: 0.7rem; padding: 2px 8px; }
+  .finish-reading-btn { padding: 7px 12px; font-size: 0.8rem; }
+  .scratch-trigger-btn { padding: 4px 8px; font-size: 0.7rem; }
+  
+  .fireworks-hero-banner { padding: 8px 6px; }
+  .love-heart-beat { font-size: 28px; margin: 1px 0; }
+  .love-days-box { padding: 4px; margin-bottom: 6px; }
+  .counter-num-box { padding: 3px 2px; }
+  .counter-num-val { font-size: 1rem; }
+  
+  .carousel-card-active { max-height: 195px; }
+  .media-tab-bar { margin: 2px 0 3px; }
+  .tab-btn { padding: 3px 10px; font-size: 0.72rem; }
+  
+  .orbit-stage { height: 95px; width: 155px; }
+  .kissing-halo { width: 80px; height: 80px; }
+  .kiss-heart-burst { font-size: 15px; top: -10px; }
+  .p5-vow-card { padding: 3px 6px; margin: 1px 0; }
+  .p5-vow-quote { font-size: 0.78rem; line-height: 1.25; }
+  .p5-actions-grid { margin: 1px 0; gap: 4px; }
+  .fun-quiz-btn { padding: 5px 6px; font-size: 0.74rem; min-height: 32px; }
+  .p5-actions-grid .kiss-action-btn { padding: 5px 6px; font-size: 0.74rem; min-height: 32px; }
+  .scratch-stage-wrapper { height: 148px; }
+  .quiz-interactive-stage { min-height: 150px; }
+  .quiz-modal-box { padding: 12px 10px; }
+  .kiss-action-btn { padding: 5px 10px; font-size: 0.78rem; min-height: 32px; }
+  .bottom-nav-row .cute-btn { padding: 5px 6px; font-size: 0.72rem; min-height: 32px; }
+}
+
+/* Nhóm 5: Màn hình cực ngắn hoặc khi bàn phím ảo hiển thị (Height <= 600px) */
 @media screen and (max-height: 600px) {
   .page {
-    padding-top: calc(max(4px, env(safe-area-inset-top)) + 34px);
+    padding-top: calc(max(4px, env(safe-area-inset-top)) + 30px);
     padding-bottom: calc(max(4px, env(safe-area-inset-bottom)) + 4px);
   }
   .window-doors { display: none; }
-  .gift-box-emoji { font-size: 34px; }
-  .orbit-stage { height: 85px; width: 135px; }
-  .kissing-halo { width: 72px; height: 72px; }
-  .kiss-heart-burst { font-size: 14px; top: -8px; }
-  .p5-title { font-size: 1rem; }
-  .couple-names-strip { font-size: 0.88rem; }
-  .p5-vow-quote { font-size: 0.74rem; }
-  .carousel-card-active { max-height: 165px; }
+  .gift-box-emoji { font-size: 32px; }
+  .orbit-stage { height: 80px; width: 130px; }
+  .kissing-halo { width: 68px; height: 68px; }
+  .kiss-heart-burst { font-size: 13px; top: -7px; }
+  .p5-title { font-size: 0.95rem; }
+  .couple-names-strip { font-size: 0.84rem; }
+  .p5-vow-quote { font-size: 0.72rem; }
+  .p5-actions-grid { margin: 1px 0; gap: 4px; }
+  .fun-quiz-btn, .p5-actions-grid .kiss-action-btn { min-height: 28px; padding: 3px 6px; font-size: 0.7rem; }
+  .scratch-stage-wrapper { height: 136px; }
+  .carousel-card-active { max-height: 155px; }
 }

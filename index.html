@@ -136,8 +136,8 @@
             </div>
 
             <!-- Khung nội dung lời chúc ấm áp -->
-            <div class="wish-letter-box">
-              <div class="wish-letter-text">
+            <div class="wish-letter-box" onclick="skipTypewriter()" title="Chạm để xem nhanh">
+              <div class="wish-letter-text" id="wishLetterText">
                 <p class="wish-paragraph">
                   Cảm ơn em đã xuất hiện trong cuộc đời anh, mang đến cho anh những nụ cười ấm áp, những niềm vui dịu dàng và những khoảnh khắc hạnh phúc không gì sánh bằng.
                 </p>
@@ -152,6 +152,7 @@
                   Mãi yêu em, <span class="partner-name-display">Bé Yêu</span>! ❤️
                 </div>
               </div>
+              <div class="typewriter-skip-hint" id="typewriterSkipHint" style="display:none;">(Chạm vào thư để hiện hết nhanh ✨)</div>
 
               <!-- Dải hình trái tim & sticker tình yêu lấp đầy khoảng trắng -->
               <div class="wish-bottom-deco">
@@ -165,6 +166,9 @@
                 <div class="sweet-vow-badge">
                   <span>🎀 Trọn đời yêu em, công chúa của anh 🎀</span>
                 </div>
+                <button class="scratch-trigger-btn" onclick="openScratchCardModal(event)" title="Cào thẻ nhận điều ước">
+                  <span>🎟️ Cào thẻ nhận điều ước bí mật ✨</span>
+                </button>
               </div>
             </div>
 
@@ -558,20 +562,29 @@
             </p>
           </div>
 
-          <!-- Nút bấm gửi ngàn nụ hôn hoành tráng -->
-          <button class="kiss-action-btn" onclick="sendKissesFountain()">
-            💋 Gửi ngàn nụ hôn cho em 💋
-          </button>
+          <!-- Cặp nút tương tác: Thử lòng bé yêu & Gửi ngàn nụ hôn -->
+          <div class="p5-actions-grid">
+            <button class="fun-quiz-btn" onclick="openLoveQuizModal()" title="Hỏi nhỏ em nè">
+              💌 Hỏi nhỏ Huệ nè 🥰
+            </button>
+            <button class="kiss-action-btn" onclick="sendKissesFountain()" title="Gửi nụ hôn">
+              💋 Gửi ngàn nụ hôn 💋
+            </button>
+          </div>
 
           <!-- Thanh điều hướng chuyển trang -->
           <div class="bottom-nav-row" style="margin-top: 4px;">
+            <button class="cute-btn" onclick="openScratchCardModal(event)"
+              style="background: #fff8e7; color: #b86200; border: 1.5px solid #ffd166;" title="Cào thẻ điều ước">
+              🎟️ Thẻ cào 🎁
+            </button>
             <button class="cute-btn" onclick="goToPage(1)"
               style="background: white; color: var(--pink-600); border: 1.5px solid var(--pink-300);">
               Về đầu 🎀
             </button>
             <button class="cute-btn" onclick="goToPage(4)"
               style="background: white; color: var(--pink-600); border: 1.5px solid var(--pink-300);">
-              Xem ảnh & video 📸
+              Xem ảnh 📸
             </button>
           </div>
 
@@ -658,6 +671,93 @@
           </div>
           <div id="uploadStatusText"
             style="font-size: 0.8rem; color: #059669; font-weight: 800; margin-top: 6px; min-height: 18px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal trêu ghẹo đáng yêu: Em có yêu anh không? (Nút né ngón tay) -->
+    <div id="loveQuizModal" class="media-modal" onclick="closeLoveQuizModal()">
+      <div class="quiz-modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close-btn" onclick="closeLoveQuizModal()" title="Đóng">✕</button>
+        
+        <div id="quizQuestionStage">
+          <div class="quiz-badge">💌 CÂU HỎI QUAN TRỌNG NHẤT 💌</div>
+          <h3 class="quiz-question-title">Hỏi Nhỏ Nè Bé Yêu 🥰</h3>
+          <p class="quiz-question-sub">
+            <span class="partner-name-display">Bé Huệ</span> ơi, em có yêu anh nhiều thật nhiều hông dạ? 💕
+          </p>
+
+          <div class="quiz-interactive-stage" id="quizPlayground">
+            <button id="quizBtnYes" class="quiz-btn-yes" onclick="handleLoveYes()">
+              ❤️ Yêu anh nhất trần đời! ❤️
+            </button>
+            <button id="quizBtnNo" class="quiz-btn-no">
+              😜 Hông yêu đâu!
+            </button>
+          </div>
+        </div>
+
+        <div id="quizSuccessStage" class="quiz-success-view" style="display:none;">
+          <div class="quiz-success-emoji">👩‍❤️‍💋‍👨💋🎉</div>
+          <h3 class="quiz-success-title">Moaaahhh! Yêu Em Nhất! 💖</h3>
+          <p class="quiz-success-desc">
+            Anh biết ngay mà! <span class="partner-name-display">Huệ</span> là cô gái ngoan, xinh đẹp và đáng yêu nhất vũ trụ này! Anh cũng yêu em ngàn lần vạn lần! 💍✨
+          </p>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button class="cute-btn" onclick="finishQuizWithKiss()" style="padding: 8px 14px; font-size: clamp(0.76rem, 2.9vw, 0.86rem);">
+              💋 Nhận ngàn nụ hôn nè 💋
+            </button>
+            <button class="cute-btn" onclick="resetLoveQuiz()" style="background: white; color: var(--pink-600); border: 1.5px solid var(--pink-300); padding: 8px 14px; font-size: clamp(0.76rem, 2.9vw, 0.86rem);">
+              Hỏi lại 🔄
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Thẻ Cào Tình Yêu May Mắn (Scratch Card) -->
+    <div id="scratchCardModal" class="media-modal" onclick="closeScratchCardModal()">
+      <div class="scratch-modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close-btn" onclick="closeScratchCardModal()" title="Đóng">✕</button>
+        
+        <div class="scratch-ticket">
+          <div class="scratch-ticket-badge">✨ OFFICIAL LOVE PASS #520 ✨</div>
+          <h3 class="scratch-ticket-title">Thẻ Cào Tình Yêu Bí Mật 🎟️</h3>
+          <div class="scratch-ticket-subtitle">
+            Món quà đặc quyền dành riêng cho công chúa <span class="partner-name-display">Bé Yêu</span> 💕
+          </div>
+
+          <!-- Khung thẻ cào có canvas phủ nhũ -->
+          <div class="scratch-stage-wrapper" id="scratchStageWrapper">
+            <!-- Phần thưởng ẩn giấu bên dưới -->
+            <div class="scratch-hidden-content" id="scratchHiddenContent">
+              <div class="voucher-icon" id="voucherIcon">🧋</div>
+              <div class="voucher-title" id="voucherTitle">VÉ ĐẶC QUYỀN VÔ HẠN</div>
+              <div class="voucher-desc" id="voucherDesc">
+                Huệ được quyền bắt Anh mua trà sữa, dắt đi ăn mọi món ngon mà không được từ chối!
+              </div>
+              <div class="voucher-term" id="voucherTerm">
+                🌸 Hạn dùng: Suốt đời bên nhau • Vô điều kiện 💖
+              </div>
+            </div>
+
+            <!-- Canvas phủ lớp nhũ bạc/vàng lấp lánh -->
+            <canvas id="scratchCanvas"></canvas>
+          </div>
+
+          <div class="scratch-hint-text" id="scratchHintText">
+            ✨ Dùng ngón tay cào nhẹ lớp nhũ để mở quà nhé! 🎁
+          </div>
+
+          <!-- Các nút thao tác thẻ cào -->
+          <div class="scratch-actions-row">
+            <button class="cute-btn" onclick="rollNextScratchCard()" style="background: #fff0f5; color: var(--pink-600); border: 1.5px solid #ff9ebb;">
+              🎲 Cào thẻ khác
+            </button>
+            <button class="cute-btn" onclick="claimScratchReward()">
+              💖 Nhận điều ước này
+            </button>
+          </div>
         </div>
       </div>
     </div>
